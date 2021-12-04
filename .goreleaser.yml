@@ -44,16 +44,21 @@ changelog:
 brews:
   - tap:
       owner: hupe1980
-      name: homebrew-tap
+      name: homebrew-fileserve
+    commit_author:
+      name: hupe1980
     homepage:  https://github.com/hupe1980/fileserve
     description: Golang-based simple file server to serve static files of the current working directory
     license: MIT
     test: |
       system "#{bin}/fileserve -v"
+    
 scoop:
   bucket:
     owner: hupe1980
-    name: scoop-bucket
+    name: fileserve-bucket
+  commit_author:
+      name: hupe1980
   homepage:  https://github.com/hupe1980/fileserve
   description: Golang-based simple file server to serve static files of the current working directory
   license: MIT

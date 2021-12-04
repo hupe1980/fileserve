@@ -12,6 +12,34 @@
 - HTTPS with self-signed certificate
 - BasicAuth
 
+## Installing
+You can install the pre-compiled binary in several different ways
+
+### homebrew tap:
+```bash
+brew tap hupe1980/fileserve
+brew install fileserve
+```
+
+### snapcraft:
+[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/fileserve)
+```bash
+sudo snap install fileserve
+```
+
+### scoop:
+```bash
+scoop bucket add fileserve https://github.com/hupe1980/fileserve-bucket.git
+scoop install fileserve
+```
+
+### deb/rpm/apk:
+
+Download the .deb, .rpm or .apk from the [releases page](https://github.com/hupe1980/fileserve/releases) and install them with the appropriate tools.
+
+### manually:
+Download the pre-compiled binaries from the [releases page](https://github.com/hupe1980/fileserve/releases) and copy to the desired location.
+
 ## How to use
 ```bash
 fileserve is a tiny go based file server

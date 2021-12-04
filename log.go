@@ -14,7 +14,7 @@ func AccessLog() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			le := NewLogEntry(r)
-			lw := newLogResponseWriter(w, r.ProtoMajor)
+			lw := newLogResponseWriter(w)
 			defer func() {
 				le.Write(lw.Status(), lw.Header())
 			}()
@@ -62,7 +62,7 @@ type logResponseWriter struct {
 	code        int
 }
 
-func newLogResponseWriter(w http.ResponseWriter, protoMajor int) *logResponseWriter {
+func newLogResponseWriter(w http.ResponseWriter) *logResponseWriter {
 	return &logResponseWriter{
 		ResponseWriter: w,
 	}
@@ -98,5 +98,6 @@ func (l *logResponseWriter) Pusher() (pusher http.Pusher) {
 	if pusher, ok := l.ResponseWriter.(http.Pusher); ok {
 		return pusher
 	}
+
 	return nil
 }

@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	version     = "dev"
-	defaultPort = 8000
+	version    = "dev"
+	credsParts = 2
 )
 
 func main() {
@@ -73,7 +73,7 @@ func main() {
 	}
 
 	rootCmd.Flags().StringVarP(&bind, "bind", "b", "0.0.0.0", "bind to a specific interface")
-	rootCmd.Flags().IntVarP(&port, "port", "p", defaultPort, "port to serve on")
+	rootCmd.Flags().IntVarP(&port, "port", "p", fileserve.DefaultPort, "port to serve on")
 	rootCmd.Flags().BoolVarP(&https, "https", "s", false, "serve with a temp self-signed certificate via HTTPS")
 	rootCmd.Flags().BoolVarP(&cors, "cors", "", false, "allow cross origin requests to be served")
 	rootCmd.Flags().BoolVarP(&nc, "no-cache", "", false, "disable caching for the file server")
@@ -93,7 +93,7 @@ func parseAuth(auth string) (map[string]string, error) {
 	}
 
 	parts := strings.Split(auth, ":")
-	if len(parts) > 2 {
+	if len(parts) > credsParts {
 		return nil, errors.New("only one colon is allowed")
 	}
 

@@ -7,6 +7,8 @@ import (
 	"net/http"
 )
 
+const DefaultPort = 8000
+
 type Options struct {
 	Port int
 	Bind string
@@ -25,7 +27,7 @@ func New(dir string, optFns ...func(o *Options)) (*Fileserve, error) {
 	}
 
 	options := Options{
-		Port: 8080,
+		Port: DefaultPort,
 		Bind: "0.0.0.0",
 		TLS:  false,
 	}
@@ -72,5 +74,6 @@ func (s *Fileserve) listenAndServe() error {
 
 		return server.ListenAndServeTLS("", "")
 	}
+
 	return http.ListenAndServe(addr, s.handler)
 }

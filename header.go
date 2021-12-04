@@ -9,6 +9,7 @@ func HTTPHeader(key, value string) func(next http.Handler) http.Handler {
 			w.Header().Set(key, value)
 			next.ServeHTTP(w, r)
 		}
+
 		return http.HandlerFunc(fn)
 	}
 }
@@ -23,6 +24,7 @@ func CORS(origin string) func(next http.Handler) http.Handler {
 
 			next.ServeHTTP(w, r)
 		}
+
 		return http.HandlerFunc(fn)
 	}
 }

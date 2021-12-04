@@ -21,6 +21,7 @@ func TestBasicAuth(t *testing.T) {
 	t.Run("unauthorized", func(t *testing.T) {
 		r, err := http.Get(ts.URL)
 		assert.NoError(t, err)
+		defer r.Body.Close()
 		assert.Equal(t, http.StatusUnauthorized, r.StatusCode)
 	})
 
@@ -32,6 +33,7 @@ func TestBasicAuth(t *testing.T) {
 
 		r, err := http.DefaultClient.Do(req)
 		assert.NoError(t, err)
+		defer r.Body.Close()
 		assert.Equal(t, http.StatusOK, r.StatusCode)
 	})
 }

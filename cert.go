@@ -1,4 +1,4 @@
-package main
+package fileserve
 
 import (
 	"crypto/ecdsa"
@@ -19,7 +19,7 @@ const (
 	certValidityDuration time.Duration = 24 * time.Hour * 7 // 7 days
 )
 
-func SelfSignedCert(sans []string) (tls.Certificate, error) {
+func NewSelfSignedCert(sans []string) (tls.Certificate, error) {
 	privKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		return tls.Certificate{}, fmt.Errorf("failed to generate private key: %v", err)

@@ -1,28 +1,37 @@
-package main
+package fileserve
 
 import (
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParseCreds(t *testing.T) {
-	t.Run("user:pass", func(t *testing.T) {
-		user, pass, err := ParseCreds("user:pass")
+func TestBasicAuth(t *testing.T) {
+	withBasicAuth := BasicAuth("restricted", map[string]string{"user": "pass"})
+
+	handler := withBasicAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "helloworld")
+	}))
+
+	ts := httptest.NewServer(handler)
+
+	t.Run("unauthorized", func(t *testing.T) {
+		r, err := http.Get(ts.URL)
 		assert.NoError(t, err)
-		assert.Equal(t, "user", user)
-		assert.Equal(t, "pass", pass)
+		assert.Equal(t, http.StatusUnauthorized, r.StatusCode)
 	})
 
-	t.Run("invalid format", func(t *testing.T) {
-		_, _, err := ParseCreds("userpass")
-		assert.Error(t, err)
-		assert.Equal(t, "credentials must be specified in the format username:password", err.Error())
-	})
+	t.Run("Authorized", func(t *testing.T) {
+		req, err := http.NewRequest("Get", ts.URL, nil)
+		assert.NoError(t, err)
 
-	t.Run("too many parts", func(t *testing.T) {
-		_, _, err := ParseCreds("us:er:pa:ss")
-		assert.Error(t, err)
-		assert.Equal(t, "cannot parse credentials", err.Error())
+		req.SetBasicAuth("user", "pass")
+
+		r, err := http.DefaultClient.Do(req)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, r.StatusCode)
 	})
 }

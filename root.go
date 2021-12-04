@@ -1,4 +1,4 @@
-package main
+package fileserve
 
 import (
 	"fmt"
@@ -6,16 +6,16 @@ import (
 	"os"
 )
 
-func Root(dir string) (http.Dir, error) {
+func newRoot(dir string) (http.FileSystem, error) {
 	fileInfo, err := os.Stat(dir)
 	if err != nil {
-		return "", fmt.Errorf("cannot serve %v: %v", dir, err)
+		return nil, fmt.Errorf("cannot serve %v: %v", dir, err)
 	} else if !fileInfo.IsDir() {
-		return "", fmt.Errorf("cannot serve %v: not a directory", dir)
+		return nil, fmt.Errorf("cannot serve %v: not a directory", dir)
 	} else {
 		file, err := os.Open(dir)
 		if err != nil {
-			return "", fmt.Errorf("cannot serve %v: %v", dir, err)
+			return nil, fmt.Errorf("cannot serve %v: %v", dir, err)
 		}
 		file.Close()
 	}

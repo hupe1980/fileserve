@@ -1,0 +1,86 @@
+env:
+  - GO111MODULE=on
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - 386
+      - amd64
+      - arm
+      - arm64
+archives:
+  - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - README.md
+      - LICENSE
+checksum:
+  name_template: '{{ .ProjectName }}_checksums.txt'
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - Merge pull request
+      - Merge branch
+      - go mod tidy
+brews:
+  - tap:
+      owner: hupe1980
+      name: homebrew-fileserve
+    homepage:  https://github.com/hupe1980/fileserve
+    description: Golang-based simple file server to serve static files of the current working directory
+    license: MIT
+    test: |
+      system "#{bin}/fileserve -v"
+scoop:
+  bucket:
+    owner: hupe1980
+    name: fileserve-bucket
+  homepage:  https://github.com/hupe1980/fileserve
+  description: Golang-based simple file server to serve static files of the current working directory
+  license: MIT
+nfpms:
+  - file_name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    homepage:  https://github.com/hupe1980/fileserve
+    description: Golang-based simple file server to serve static files of the current working directory
+    license: MIT
+    formats:
+    - apk
+    - deb
+    - rpm
+snapcrafts:
+  - name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    summary: Golang-based simple file server to serve static files of the current working directorynbound ports, maintain bastion hosts, or manage SSH keys
+    description: |
+      fileserve is a golang-based simple file server to serve static files of the current working directory
+      
+      You can use it for:
+      - File sharing in LAN or home network
+      - Web application testing
+      - Personal web site hosting or demonstrating
+
+      Features:
+      - Directory listing
+      - Cors or NoCache headers
+      - HTTPS with self-signed certificate
+      - BasicAuth
+    grade: stable
+    confinement: strict
+    publish: true

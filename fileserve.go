@@ -20,12 +20,7 @@ type Fileserve struct {
 	options Options
 }
 
-func New(dir string, optFns ...func(o *Options)) (*Fileserve, error) {
-	root, err := newRoot(dir)
-	if err != nil {
-		return nil, err
-	}
-
+func New(fs http.FileSystem, optFns ...func(o *Options)) (*Fileserve, error) {
 	options := Options{
 		Port: DefaultPort,
 		Bind: "0.0.0.0",
@@ -38,7 +33,7 @@ func New(dir string, optFns ...func(o *Options)) (*Fileserve, error) {
 
 	return &Fileserve{
 		options: options,
-		handler: http.FileServer(root),
+		handler: http.FileServer(fs),
 	}, nil
 }
 

@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func newRoot(dir string) (http.FileSystem, error) {
+func NewDirRoot(dir string) (http.FileSystem, error) {
 	fileInfo, err := os.Stat(dir)
 	if err != nil {
 		return nil, fmt.Errorf("cannot serve %v: %v", dir, err)

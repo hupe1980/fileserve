@@ -52,7 +52,6 @@ brews:
     license: MIT
     test: |
       system "#{bin}/fileserve -v"
-    
 scoop:
   bucket:
     owner: hupe1980

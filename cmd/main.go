@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -35,7 +36,12 @@ func main() {
 - add basi auth: fileserve . -a user1:pass1 -a user2:pass2
 - add custom http headers: fileserve . --header Test=ABC --header Foo=Bar`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			root := args[0]
+			dir := args[0]
+
+			root, err := fileserve.NewDirRoot(dir)
+			if err != nil {
+				return err
+			}
 
 			fs, err := fileserve.New(root, func(o *fileserve.Options) {
 				o.Port = port
@@ -75,7 +81,7 @@ func main() {
 			if https {
 				schema = "https"
 			}
-			fmt.Printf("Serving \"%s\" on: %v://%v:%d\n", root, schema, bind, port)
+			log.Printf("Serving \"%s\" on: %v://%v:%d\n", dir, schema, bind, port)
 
 			return fs.ListenAndServe()
 		},

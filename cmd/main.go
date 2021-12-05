@@ -34,13 +34,16 @@ func main() {
 		Use:     "fileserve [root]",
 		Version: version,
 		Short:   "fileserve is a tiny go based file server",
-		Args:    cobra.MinimumNArgs(1),
+		Args:    cobra.MaximumNArgs(1),
 		Example: `- serve the current working dir: fileserve .
 - add basic auth: fileserve . -a user1:pass1 -a user2:pass2
 - add custom http headers: fileserve . --header Test=ABC --header Foo=Bar
 - disable serving of dot files: fileserve . --no-dot`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			dir := args[0]
+			dir := "."
+			if len(args) == 1 {
+				dir = args[0]
+			}
 
 			root, err := fileserve.NewDirRoot(dir, func(o *fileserve.DirRootOptions) {
 				o.ShowDirListing = !noDir

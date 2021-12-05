@@ -50,10 +50,10 @@ Usage:
   fileserve [root] [flags]
 
 Examples:
-- serve the current working dir: fileserve .
-- add basic auth: fileserve . -a user1:pass1 -a user2:pass2
-- add custom http headers: fileserve . --header Test=ABC --header Foo=Bar
-- disable serving of dot files: fileserve . --no-dot
+- serve the current working dir: fileserve
+- add basic auth: fileserve -a user1:pass1 -a user2:pass2
+- add custom http headers: fileserve --header Test=ABC --header Foo=Bar
+- disable serving of dot files: fileserve --no-dot
 
 Flags:
   -a, --auth stringArray        turn on basic auth and set username and password (separate by colon)

@@ -8,6 +8,7 @@
 
 ## Features
 - Directory listing
+- Filter dot files
 - Cors or NoCache headers
 - HTTPS with self-signed certificate
 - BasicAuth

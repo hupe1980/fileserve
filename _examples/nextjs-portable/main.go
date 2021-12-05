@@ -21,7 +21,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	root, err := fileserve.NewFSRoot(distFS)
+	root, err := fileserve.NewFSRoot(distFS, func(o *fileserve.DirRootOptions) {
+		o.ShowDirListing = false
+		o.ShowDotFiles = false
+	})
 	if err != nil {
 		log.Fatal(err)
 	}

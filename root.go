@@ -11,12 +11,16 @@ import (
 
 const DefaultIndexPage = "index.html"
 
+type Root interface {
+	http.FileSystem
+}
+
 type DirRootOptions struct {
 	ShowDirListing bool
 	ShowDotFiles   bool
 }
 
-func NewDirRoot(dir string, optFns ...func(o *DirRootOptions)) (http.FileSystem, error) {
+func NewDirRoot(dir string, optFns ...func(o *DirRootOptions)) (Root, error) {
 	fileInfo, err := os.Stat(dir)
 	if err != nil {
 		return nil, fmt.Errorf("cannot serve %v: %v", dir, err)
@@ -39,20 +43,37 @@ func NewDirRoot(dir string, optFns ...func(o *DirRootOptions)) (http.FileSystem,
 		fn(&options)
 	}
 
-	return dirFilesystem{
+	return rootFilesystem{
 		FileSystem:     http.Dir(dir),
 		showDirListing: options.ShowDirListing,
 		showDotFiles:   options.ShowDotFiles,
 	}, nil
 }
 
-type dirFilesystem struct {
+func NewFSRoot(distFS fs.FS, optFns ...func(o *DirRootOptions)) (Root, error) {
+	options := DirRootOptions{
+		ShowDirListing: false,
+		ShowDotFiles:   false,
+	}
+
+	for _, fn := range optFns {
+		fn(&options)
+	}
+
+	return rootFilesystem{
+		FileSystem:     http.FS(distFS),
+		showDirListing: options.ShowDirListing,
+		showDotFiles:   options.ShowDotFiles,
+	}, nil
+}
+
+type rootFilesystem struct {
 	http.FileSystem
 	showDirListing bool
 	showDotFiles   bool
 }
 
-func (fs dirFilesystem) Open(name string) (http.File, error) {
+func (fs rootFilesystem) Open(name string) (http.File, error) {
 	f, err := fs.FileSystem.Open(name)
 	if err != nil {
 		return nil, err
@@ -128,8 +149,4 @@ LOOP:
 	}
 
 	return nil, os.ErrNotExist
-}
-
-func NewFSRoot(distFS fs.FS) (http.FileSystem, error) {
-	return http.FS(distFS), nil
 }

@@ -11,7 +11,7 @@ func TestNewRoot(t *testing.T) {
 	t.Run("dot", func(t *testing.T) {
 		r, err := NewDirRoot(".")
 		assert.NoError(t, err)
-		assert.Equal(t, dirFilesystem{FileSystem: http.Dir("."), showDirListing: false, showDotFiles: false}, r)
+		assert.Equal(t, rootFilesystem{FileSystem: http.Dir("."), showDirListing: false, showDotFiles: false}, r)
 	})
 
 	t.Run("not a directory", func(t *testing.T) {

@@ -129,3 +129,7 @@ LOOP:
 
 	return nil, os.ErrNotExist
 }
+
+func NewFSRoot(distFS fs.FS) (http.FileSystem, error) {
+	return http.FS(distFS), nil
+}

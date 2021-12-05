@@ -69,5 +69,8 @@ Flags:
   -v, --version                 version for fileserve
 ```
 
+Or use the module to create your own protable:
+* [nextjs-portable example](_examples/nextjs-portable) 
+
 ## License
 [MIT](LICENCE)

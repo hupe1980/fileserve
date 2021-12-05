@@ -64,6 +64,7 @@ scoop:
 nfpms:
   - file_name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
     homepage:  https://github.com/hupe1980/fileserve
+    maintainer: Frank Hübner <frankhuebner1980@gmail.com>
     description: Golang-based simple file server to serve static files of the current working directory
     license: MIT
     formats:

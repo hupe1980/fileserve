@@ -21,7 +21,7 @@ setup:
 .PHONY: run
 ## run: Run fileserve
 run: 
-	@go run $$(ls -1 cmd/*.go | grep -v _test.go) .
+	@go run $$(ls -1 cmd/*.go | grep -v _test.go) -h
 
 .PHONY: test
 ## test: Runs go test with default values

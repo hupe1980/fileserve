@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 
@@ -23,6 +24,8 @@ func main() {
 		https   bool
 		cors    bool
 		nc      bool
+		noDir   bool
+		noDot   bool
 		auths   []string
 		headers map[string]string
 	)
@@ -33,12 +36,16 @@ func main() {
 		Short:   "fileserve is a tiny go based file server",
 		Args:    cobra.MinimumNArgs(1),
 		Example: `- serve the current working dir: fileserve .
-- add basi auth: fileserve . -a user1:pass1 -a user2:pass2
-- add custom http headers: fileserve . --header Test=ABC --header Foo=Bar`,
+- add basic auth: fileserve . -a user1:pass1 -a user2:pass2
+- add custom http headers: fileserve . --header Test=ABC --header Foo=Bar
+- disable serving of dot files: fileserve . --no-dot`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			dir := args[0]
 
-			root, err := fileserve.NewDirRoot(dir)
+			root, err := fileserve.NewDirRoot(dir, func(o *fileserve.DirRootOptions) {
+				o.ShowDirListing = !noDir
+				o.ShowDotFiles = !noDot
+			})
 			if err != nil {
 				return err
 			}
@@ -53,6 +60,10 @@ func main() {
 			}
 
 			fs.Use(fileserve.AccessLog())
+
+			if noDot {
+				fs.Use(fileserve.NoDot("404 page not found", http.StatusNotFound))
+			}
 
 			if cors {
 				fs.Use(fileserve.CORS("*"))
@@ -92,6 +103,8 @@ func main() {
 	rootCmd.Flags().BoolVarP(&https, "https", "s", false, "serve with a temp self-signed certificate via HTTPS")
 	rootCmd.Flags().BoolVarP(&cors, "cors", "", false, "allow cross origin requests to be served")
 	rootCmd.Flags().BoolVarP(&nc, "no-cache", "", false, "disable caching for the file server")
+	rootCmd.Flags().BoolVarP(&noDir, "no-dir", "", false, "turn off directory listing")
+	rootCmd.Flags().BoolVarP(&noDot, "no-dot", "", false, "disable serving of dot files")
 	rootCmd.Flags().StringArrayVarP(&auths, "auth", "a", []string{}, "turn on basic auth and set username and password (separate by colon)")
 	rootCmd.Flags().StringToStringVarP(&headers, "header", "", map[string]string{}, "add custom http headers")
 

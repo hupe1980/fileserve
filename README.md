@@ -50,8 +50,9 @@ Usage:
 
 Examples:
 - serve the current working dir: fileserve .
-- add basi auth: fileserve . -a user1:pass1 -a user2:pass2
+- add basic auth: fileserve . -a user1:pass1 -a user2:pass2
 - add custom http headers: fileserve . --header Test=ABC --header Foo=Bar
+- disable serving of dot files: fileserve . --no-dot
 
 Flags:
   -a, --auth stringArray        turn on basic auth and set username and password (separate by colon)
@@ -61,6 +62,8 @@ Flags:
   -h, --help                    help for fileserve
   -s, --https                   serve with a temp self-signed certificate via HTTPS
       --no-cache                disable caching for the file server
+      --no-dir                  turn off directory listing
+      --no-dot                  disable serving of dot files
   -p, --port int                port to serve on (default 8000)
   -v, --version                 version for fileserve
 ```

@@ -48,17 +48,20 @@ Usage:
   fileserve [root] [flags]
 
 Examples:
-serve the current working dir: fileserve .
+- serve the current working dir: fileserve .
+- add basi auth: fileserve . -a user1:pass1	-a user2:pass2
+- add custom http headers: fileserve . --header Test=ABC --header Foo=Bar
 
 Flags:
-  -a, --auth string   turn on basic auth and set username and password (separate by colon)
-  -b, --bind string   bind to a specific interface (default "0.0.0.0")
-      --cors          allow cross origin requests to be served
-  -h, --help          help for fileserve
-  -s, --https         serve with a temp self-signed certificate via HTTPS
-      --no-cache      disable caching for the file server
-  -p, --port int      port to serve on (default 8000)
-  -v, --version       version for fileserve
+  -a, --auth stringArray        turn on basic auth and set username and password (separate by colon)
+  -b, --bind string             bind to a specific interface (default "0.0.0.0")
+      --cors                    allow cross origin requests to be served
+      --header stringToString   add custom http headers (default [])
+  -h, --help                    help for fileserve
+  -s, --https                   serve with a temp self-signed certificate via HTTPS
+      --no-cache                disable caching for the file server
+  -p, --port int                port to serve on (default 8000)
+  -v, --version                 version for fileserve
 ```
 
 ## License

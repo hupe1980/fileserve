@@ -17,12 +17,13 @@ const (
 
 func main() {
 	var (
-		bind  string
-		port  int
-		https bool
-		cors  bool
-		nc    bool
-		auth  string
+		bind    string
+		port    int
+		https   bool
+		cors    bool
+		nc      bool
+		auths   []string
+		headers map[string]string
 	)
 
 	rootCmd := &cobra.Command{
@@ -30,7 +31,9 @@ func main() {
 		Version: version,
 		Short:   "fileserve is a tiny go based file server",
 		Args:    cobra.MinimumNArgs(1),
-		Example: "serve the current working dir: fileserve .",
+		Example: `- serve the current working dir: fileserve .
+- add basi auth: fileserve . -a user1:pass1	-a user2:pass2	
+- add custom http headers: fileserve . --header Test=ABC --header Foo=Bar`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root := args[0]
 
@@ -49,12 +52,18 @@ func main() {
 				fs.Use(fileserve.CORS("*"))
 			}
 
+			if len(headers) != 0 {
+				for k, v := range headers {
+					fs.Use(fileserve.HTTPHeader(k, v))
+				}
+			}
+
 			if nc {
 				fs.Use((fileserve.NoCache()))
 			}
 
-			if auth != "" {
-				creds, err := parseAuth(auth)
+			if len(auths) != 0 {
+				creds, err := parseAuths(auths)
 				if err != nil {
 					return err
 				}
@@ -77,7 +86,8 @@ func main() {
 	rootCmd.Flags().BoolVarP(&https, "https", "s", false, "serve with a temp self-signed certificate via HTTPS")
 	rootCmd.Flags().BoolVarP(&cors, "cors", "", false, "allow cross origin requests to be served")
 	rootCmd.Flags().BoolVarP(&nc, "no-cache", "", false, "disable caching for the file server")
-	rootCmd.Flags().StringVarP(&auth, "auth", "a", "", "turn on basic auth and set username and password (separate by colon)")
+	rootCmd.Flags().StringArrayVarP(&auths, "auth", "a", []string{}, "turn on basic auth and set username and password (separate by colon)")
+	rootCmd.Flags().StringToStringVarP(&headers, "header", "", map[string]string{}, "add custom http headers")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -85,19 +95,21 @@ func main() {
 	}
 }
 
-func parseAuth(auth string) (map[string]string, error) {
+func parseAuths(auths []string) (map[string]string, error) {
 	creds := make(map[string]string)
 
-	if !strings.Contains(auth, ":") {
-		return nil, errors.New("auth must be specified in the format username:password")
-	}
+	for _, auth := range auths {
+		if !strings.Contains(auth, ":") {
+			return nil, errors.New("auth must be specified in the format username:password")
+		}
 
-	parts := strings.Split(auth, ":")
-	if len(parts) > credsParts {
-		return nil, errors.New("only one colon is allowed")
-	}
+		parts := strings.Split(auth, ":")
+		if len(parts) > credsParts {
+			return nil, errors.New("only one colon is allowed")
+		}
 
-	creds[parts[0]] = parts[1]
+		creds[parts[0]] = parts[1]
+	}
 
 	return creds, nil
 }

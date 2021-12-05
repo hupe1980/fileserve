@@ -15,12 +15,12 @@ type Root interface {
 	http.FileSystem
 }
 
-type DirRootOptions struct {
-	ShowDirListing bool
-	ShowDotFiles   bool
+type RootOptions struct {
+	HideDirListing bool
+	HideDotFiles   bool
 }
 
-func NewDirRoot(dir string, optFns ...func(o *DirRootOptions)) (Root, error) {
+func NewDirRoot(dir string, optFns ...func(o *RootOptions)) (Root, error) {
 	fileInfo, err := os.Stat(dir)
 	if err != nil {
 		return nil, fmt.Errorf("cannot serve %v: %v", dir, err)
@@ -34,9 +34,9 @@ func NewDirRoot(dir string, optFns ...func(o *DirRootOptions)) (Root, error) {
 		file.Close()
 	}
 
-	options := DirRootOptions{
-		ShowDirListing: false,
-		ShowDotFiles:   false,
+	options := RootOptions{
+		HideDirListing: false,
+		HideDotFiles:   false,
 	}
 
 	for _, fn := range optFns {
@@ -45,15 +45,15 @@ func NewDirRoot(dir string, optFns ...func(o *DirRootOptions)) (Root, error) {
 
 	return rootFilesystem{
 		FileSystem:     http.Dir(dir),
-		showDirListing: options.ShowDirListing,
-		showDotFiles:   options.ShowDotFiles,
+		hideDirListing: options.HideDirListing,
+		hideDotFiles:   options.HideDotFiles,
 	}, nil
 }
 
-func NewFSRoot(distFS fs.FS, optFns ...func(o *DirRootOptions)) (Root, error) {
-	options := DirRootOptions{
-		ShowDirListing: false,
-		ShowDotFiles:   false,
+func NewFSRoot(distFS fs.FS, optFns ...func(o *RootOptions)) (Root, error) {
+	options := RootOptions{
+		HideDirListing: false,
+		HideDotFiles:   false,
 	}
 
 	for _, fn := range optFns {
@@ -62,15 +62,15 @@ func NewFSRoot(distFS fs.FS, optFns ...func(o *DirRootOptions)) (Root, error) {
 
 	return rootFilesystem{
 		FileSystem:     http.FS(distFS),
-		showDirListing: options.ShowDirListing,
-		showDotFiles:   options.ShowDotFiles,
+		hideDirListing: options.HideDirListing,
+		hideDotFiles:   options.HideDotFiles,
 	}, nil
 }
 
 type rootFilesystem struct {
 	http.FileSystem
-	showDirListing bool
-	showDotFiles   bool
+	hideDirListing bool
+	hideDotFiles   bool
 }
 
 func (fs rootFilesystem) Open(name string) (http.File, error) {
@@ -79,21 +79,21 @@ func (fs rootFilesystem) Open(name string) (http.File, error) {
 		return nil, err
 	}
 
-	if fs.showDirListing && fs.showDotFiles {
+	if !fs.hideDirListing && !fs.hideDotFiles {
 		return f, nil
 	}
 
 	return wrappedFile{
 		File:           f,
-		showDirListing: fs.showDirListing,
-		showDotFiles:   fs.showDotFiles,
+		hideDirListing: fs.hideDirListing,
+		hideDotFiles:   fs.hideDotFiles,
 	}, nil
 }
 
 type wrappedFile struct {
 	http.File
-	showDirListing bool
-	showDotFiles   bool
+	hideDirListing bool
+	hideDotFiles   bool
 }
 
 func (f wrappedFile) Stat() (os.FileInfo, error) {
@@ -102,7 +102,7 @@ func (f wrappedFile) Stat() (os.FileInfo, error) {
 		return nil, err
 	}
 
-	if s.IsDir() && !f.showDirListing {
+	if s.IsDir() && f.hideDirListing {
 		return f.findIndexPage(s, "index.html")
 	}
 
@@ -115,19 +115,19 @@ func (f wrappedFile) Readdir(count int) ([]fs.FileInfo, error) {
 		return nil, err
 	}
 
-	if f.showDotFiles {
-		return fi, nil
-	}
+	if f.hideDotFiles {
+		filtered := []fs.FileInfo{}
 
-	filtered := []fs.FileInfo{}
-
-	for _, f := range fi {
-		if !strings.HasPrefix(f.Name(), ".") {
-			filtered = append(filtered, f)
+		for _, f := range fi {
+			if !strings.HasPrefix(f.Name(), ".") {
+				filtered = append(filtered, f)
+			}
 		}
+
+		return filtered, err
 	}
 
-	return filtered, err
+	return fi, nil
 }
 
 func (f wrappedFile) findIndexPage(s fs.FileInfo, indexPageName string) (os.FileInfo, error) {

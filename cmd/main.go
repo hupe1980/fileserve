@@ -45,9 +45,9 @@ func main() {
 				dir = args[0]
 			}
 
-			root, err := fileserve.NewDirRoot(dir, func(o *fileserve.DirRootOptions) {
-				o.ShowDirListing = !noDir
-				o.ShowDotFiles = !noDot
+			root, err := fileserve.NewDirRoot(dir, func(o *fileserve.RootOptions) {
+				o.HideDirListing = noDir
+				o.HideDotFiles = noDot
 			})
 			if err != nil {
 				return err

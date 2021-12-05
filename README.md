@@ -11,6 +11,7 @@
 - Cors or NoCache headers
 - HTTPS with self-signed certificate
 - BasicAuth
+- Custom HTTP headers
 
 ## Installing
 You can install the pre-compiled binary in several different ways

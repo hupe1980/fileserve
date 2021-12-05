@@ -32,7 +32,7 @@ func main() {
 		Short:   "fileserve is a tiny go based file server",
 		Args:    cobra.MinimumNArgs(1),
 		Example: `- serve the current working dir: fileserve .
-- add basi auth: fileserve . -a user1:pass1	-a user2:pass2	
+- add basi auth: fileserve . -a user1:pass1 -a user2:pass2
 - add custom http headers: fileserve . --header Test=ABC --header Foo=Bar`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root := args[0]

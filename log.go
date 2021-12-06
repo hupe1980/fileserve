@@ -13,7 +13,7 @@ import (
 func AccessLog() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			le := NewLogEntry(r)
+			le := newLogEntry(r)
 			lw := newLogResponseWriter(w)
 			defer func() {
 				le.Write(lw.Status(), lw.Header())
@@ -23,14 +23,14 @@ func AccessLog() func(next http.Handler) http.Handler {
 	}
 }
 
-type LogEntry struct {
+type logEntry struct {
 	logger  *log.Logger
 	request *http.Request
 	buf     *bytes.Buffer
 }
 
-func NewLogEntry(r *http.Request) *LogEntry {
-	e := &LogEntry{
+func newLogEntry(r *http.Request) *logEntry {
+	e := &logEntry{
 		logger:  log.New(os.Stdout, "", log.LstdFlags),
 		request: r,
 		buf:     &bytes.Buffer{},
@@ -51,7 +51,7 @@ func NewLogEntry(r *http.Request) *LogEntry {
 	return e
 }
 
-func (e *LogEntry) Write(status int, header http.Header) {
+func (e *logEntry) Write(status int, header http.Header) {
 	fmt.Fprintf(e.buf, "%03d", status)
 	e.logger.Println(e.buf.String())
 }

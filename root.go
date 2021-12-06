@@ -44,9 +44,11 @@ func NewDirRoot(dir string, optFns ...func(o *RootOptions)) (Root, error) {
 	}
 
 	return rootFilesystem{
-		FileSystem:     http.Dir(dir),
-		hideDirListing: options.HideDirListing,
-		hideDotFiles:   options.HideDotFiles,
+		FileSystem: http.Dir(dir),
+		fileOptions: fileOptions{
+			hideDirListing: options.HideDirListing,
+			hideDotFiles:   options.HideDotFiles,
+		},
 	}, nil
 }
 
@@ -61,16 +63,17 @@ func NewFSRoot(distFS fs.FS, optFns ...func(o *RootOptions)) (Root, error) {
 	}
 
 	return rootFilesystem{
-		FileSystem:     http.FS(distFS),
-		hideDirListing: options.HideDirListing,
-		hideDotFiles:   options.HideDotFiles,
+		FileSystem: http.FS(distFS),
+		fileOptions: fileOptions{
+			hideDirListing: options.HideDirListing,
+			hideDotFiles:   options.HideDotFiles,
+		},
 	}, nil
 }
 
 type rootFilesystem struct {
 	http.FileSystem
-	hideDirListing bool
-	hideDotFiles   bool
+	fileOptions
 }
 
 func (fs rootFilesystem) Open(name string) (http.File, error) {
@@ -84,16 +87,19 @@ func (fs rootFilesystem) Open(name string) (http.File, error) {
 	}
 
 	return wrappedFile{
-		File:           f,
-		hideDirListing: fs.hideDirListing,
-		hideDotFiles:   fs.hideDotFiles,
+		File:        f,
+		fileOptions: fs.fileOptions,
 	}, nil
+}
+
+type fileOptions struct {
+	hideDirListing bool
+	hideDotFiles   bool
 }
 
 type wrappedFile struct {
 	http.File
-	hideDirListing bool
-	hideDotFiles   bool
+	fileOptions
 }
 
 func (f wrappedFile) Stat() (os.FileInfo, error) {
